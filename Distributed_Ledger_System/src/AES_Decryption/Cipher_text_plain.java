@@ -1,6 +1,8 @@
-import AES_Encryption.Plain_text_cipher;
+package AES_Decryption;
 
-public class Cipher_text_plain extends Plain_text_cipher {
+import AES_Encryption.*;
+
+public class Cipher_text_plain {
 	
 	private static final byte[][] invSBox = {
 		    {(byte) 0x52, (byte) 0x09, (byte) 0x6A, (byte) 0xD5, (byte) 0x30, (byte) 0x36, (byte) 0xA5, (byte) 0x38, (byte) 0xBF, (byte) 0x40, (byte) 0xA3, (byte) 0x9E, (byte) 0x81, (byte) 0xF3, (byte) 0xD7, (byte) 0xFB},
@@ -54,6 +56,7 @@ public class Cipher_text_plain extends Plain_text_cipher {
 	            }
 	            System.out.println();
 	        }
+	    }
 	    
 	
     private static byte[][] SubstitutionBytes( byte[][] bytes) {

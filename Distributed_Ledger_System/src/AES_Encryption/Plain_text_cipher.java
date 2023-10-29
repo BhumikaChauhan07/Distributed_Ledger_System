@@ -29,6 +29,7 @@ public class  Plain_text_cipher{
 	 };
 	 
 	public static int[][] Saved_Word = new int[11][4];
+	public static byte[][] Cipher_Text;
     public static void main(String[] args) throws Exception {
         String inputString = "ABCDEFGHIJKLMNOP"; // 128-bit message (16Bytes) exact // File Handling code; 
         byte[] bytes = inputString.getBytes();
