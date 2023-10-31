@@ -1,8 +1,9 @@
 package AES_Decryption;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
-import AES_Encryption.*;
-
-public class Cipher_text_plain {
+public class Cipher_text_plain{
 	
 	private static final byte[][] invSBox = {
 		    {(byte) 0x52, (byte) 0x09, (byte) 0x6A, (byte) 0xD5, (byte) 0x30, (byte) 0x36, (byte) 0xA5, (byte) 0x38, (byte) 0xBF, (byte) 0x40, (byte) 0xA3, (byte) 0x9E, (byte) 0x81, (byte) 0xF3, (byte) 0xD7, (byte) 0xFB},
@@ -22,6 +23,7 @@ public class Cipher_text_plain {
 		    {(byte) 0xA0, (byte) 0xE0, (byte) 0x3B, (byte) 0x4D, (byte) 0xAE, (byte) 0x2A, (byte) 0xF5, (byte) 0xB0, (byte) 0xC8, (byte) 0xEB, (byte) 0xBB, (byte) 0x3C, (byte) 0x83, (byte) 0x53, (byte) 0x99, (byte) 0x61},
 		    {(byte) 0x17, (byte) 0x2B, (byte) 0x04, (byte) 0x7E, (byte) 0xBA, (byte) 0x77, (byte) 0xD6, (byte) 0x26, (byte) 0xE1, (byte) 0x69, (byte) 0x14, (byte) 0x63, (byte) 0x55, (byte) 0x21, (byte) 0x0C, (byte) 0x7D}
 		};
+		
 	
 	private final static int[][] InverseMixColumnTable = {
 		    {0xE, 0xB, 0xD, 0x9},
@@ -30,35 +32,133 @@ public class Cipher_text_plain {
 		    {0xB, 0xD, 0x9, 0xE}
 		};
 	
-
-
+	static int[] word = new int[4];
+	static int[][] retrieved_Saved_Words = new int[11][4];
 	public static void main(String[] args) {
-		int [][] Saved_word = Plain_text_cipher.Saved_Word;
-		byte [][] Cipher_Text  = Plain_text_cipher.Cipher_Text; 
-		Saved_word = reverseSavedWords(Saved_word);
+		
+		 byte[][] cipher_text = {
+				 {123 ,21, -2, -5}, 
+				 {-36, -10, 74, -67 },
+				 {-11, -115, -67, 23 },
+				 {-113, 33, -39, 29 }
+		 };
+		// Initial Word XOR 
+				String filePath = "D:\\Minor 1\\array_data.txt";
+				retrieved_Saved_Words  = readArrayFromFile(filePath);
+				System.out.println("saved words before reversal:");
+				for (int i = 0; i < 11; i++) {
+					for (int j = 0; j < 4; j++) {
+						System.out.print(retrieved_Saved_Words [i][j] +" ");
+					}
+					System.out.println();
+				}
+				
+				byte[][] textbyte = GeneratePlain(cipher_text,retrieved_Saved_Words);
+				System.out.println();
+				System.out.println();
+				System.out.println();
+				System.out.println();
+				for (int i = 0; i < 4; i++) {
+        			for (int j = 0; j < 4; j++) {
+        				System.out.print(textbyte[i][j]);
+        			}
+        			System.out.println();
+        		}
+				System.out.println();
+				System.out.println();
+				System.out.println();
+				System.out.println();
+				StringBuilder result = new StringBuilder();
+
+		        for (int i = 0; i < 4; i++) {
+        			for (int j = 0; j < 4; j++) {
+        				char character = (char) textbyte[j][i];
+        				result.append(character);
+        			}
+        			System.out.println();
+        		}
+
+		        String finalString = result.toString();
+		        System.out.println(finalString);
+	}
+		
+	
+	
+
+	public static /*String*/byte[][] GeneratePlain(byte[][] matrix , int[][] words) {
+		// Initial Word XOR 
+		//InverseWord(words);
+		int index = 10;
+		for(int i=0; i<4; i++) {
+			word[i] = words[index][i];
+		}
+		index--;
+		
+		//Round 0: 
+		for (int i = 0; i<4; i++) {
+			for(int j=0; j<4; j++) {
+				int cipherValue = (word[i] >> (8 * (3 - j)) & 0xFF); // WE created a byte matrix of each Word!
+				// Round_Word_Byte[j][i] = (byte) byteValue;
+				matrix[j][i] = (byte) (matrix[j][i] ^ (byte)cipherValue);
+			}
+		}
+		System.out.println("Round 0: ");
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				System.out.println(matrix[j][i]);
+			}
+		}
+		System.out.println("Word for the Round 0");
+		for (int i = 0; i < 4; i++) {
+			System.out.println(word[i]);
+	}
+		System.out.println();
+		
+		
+		//Round 1 - 10: Reverse Transformation
+		int counter = 0;
+        
+        while (counter < 10) {
+        	//InverseWord(words);
+        	for(int i=0; i<4; i++) {
+    			word[i] = words[index][i];
+    		}
+    		index--;
+        	// matrix = MixColumns(ShiftRows(SubstitutionBytes(matrix)));
+        	if(counter < 9) {
+        		matrix = InverseMixColumns(InverseAddRoundKey(SubstitutionBytes(InverseShiftRows(matrix)), word));
+        		System.out.println("Round : "+(counter+1));
+        		for (int i = 0; i < 4; i++) {
+        			for (int j = 0; j < 4; j++) {
+        				System.out.println(matrix[j][i]);
+        			}
+        		}
+        		System.out.println();
+        		for (int i = 0; i < 4; i++) {
+        				System.out.println(word[i]);
+        		}
+        	}
+        	else {
+        		matrix = InverseAddRoundKey(SubstitutionBytes(InverseShiftRows(matrix)), word);
+        		System.out.println("Round : "+(counter+1));
+        		for (int i = 0; i < 4; i++) {
+        			for (int j = 0; j < 4; j++) {
+        				System.out.println(matrix[j][i]);
+        			}
+        		}
+        		System.out.println();
+        		for (int i = 0; i < 4; i++) {
+    				System.out.println(word[i]);
+    		}
+        	}
+        	counter++;
+        }	
+        
+        return matrix;
 	}
 	
-	public static int[][] reverseSavedWords(int[][] matrix) {   // because the saved words are to be used in reverse order in decryption
-	    int rows = matrix.length;
-	    int cols = matrix[0].length; 
-	    for (int i = 0; i < rows / 2; i++) {
-	         int[] temp = matrix[i];
-	         matrix[i] = matrix[rows - i - 1];
-	         matrix[rows - i - 1] = temp;
-	       }
-	       return matrix;
-	    }
-
-	    public static void printMatrix(int[][] matrix) {
-	        for (int[] row : matrix) {
-	            for (int num : row) {
-	                System.out.print(num + " ");
-	            }
-	            System.out.println();
-	        }
-	    }
-	    
 	
+		
     private static byte[][] SubstitutionBytes( byte[][] bytes) {
     	for (int i = 0; i<4; i++) {
     		for (int j=0; j<4; j++) {
@@ -71,28 +171,43 @@ public class Cipher_text_plain {
     }
     
     
-    private static int[][] InverseShiftRows(int[][] matrix) {
-	    int[][] result = new int[4][4];
-
-	    // The first row remains unchanged.
-	    result[0] = matrix[0];
-
-	    // Inverse Shift of the second row by one position to the right.
-	    for (int i = 0; i < 4; i++) {
-	        result[1][i] = matrix[1][(i + 3) % 4];
-	    }
-
-	    // Inverse Shift of the third row by two positions to the right.
-	    for (int i = 0; i < 4; i++) {
-	        result[2][i] = matrix[2][(i + 2) % 4];
-	    }
-
-	    // Inverse Shift of the fourth row by three positions to the right.
-	    for (int i = 0; i < 4; i++) {
-	        result[3][i] = matrix[3][(i + 1) % 4];
-	    }
-
-	    return result;
+    private static byte[][] InverseShiftRows(byte[][] bytes) {
+    	int a = 0; 
+		int [] temp = new int[4];
+		for(int i=1; i<4; i++) {
+			while(a<i) {
+				temp[a] = bytes[i][4-i+a];
+				a++;
+			}
+			for(int j=3; j>=0; j--) {
+				if(j-i>-1) {
+					bytes[i][j] = bytes[i][j-i];
+				}
+				else {
+					bytes[i][j] = (byte) temp[(j)%4];
+				}
+			}
+			a = 0;
+		}
+		
+		
+		
+    	/*for (int i = 1; i < 4; i++) {
+            int a = 0;
+            int[] temp = new int[4];
+            while (a < i) {
+                temp[a] = bytes[i][3 - a];
+                a++;
+            }
+            for (int j = 0; j < 4; j++) {
+                if (j + i < 4) {
+                    bytes[i][j] = bytes[i][j + i];
+                } else {
+                    bytes[i][j] = (byte) temp[j % 4];
+                }
+            }
+        }*/
+		return bytes;
 	}
 
     private static byte[][] InverseMixColumns(byte[][] bytes) {
@@ -151,4 +266,43 @@ public class Cipher_text_plain {
 		}
     	return cipher;
     }
-}
+    
+
+
+        public static int[][] readArrayFromFile(String filePath) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+                String line;
+                int row = 0;
+                int col = 0;
+
+                // Determine the dimensions of the array
+                while ((line = reader.readLine()) != null) {
+                    row++;
+                    String[] values = line.split(" ");
+                    col = values.length;
+                }
+
+                // Create the 2D array based on the dimensions
+                int[][] array = new int[row][col];
+
+                // Reset the file reader
+                reader.close();
+                BufferedReader NewReader = new BufferedReader(new FileReader(filePath));
+
+                // Read the content and fill the array
+                row = 0;
+                while ((line = NewReader.readLine()) != null) {
+                    String[] values = line.split(" ");
+                    for (col = 0; col < values.length; col++) {
+                        array[row][col] = Integer.parseInt(values[col]);
+                    }
+                    row++;
+                }
+                NewReader.close();
+                return array;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null; // Handle the exception properly in your code
+            }
+        }
+    }

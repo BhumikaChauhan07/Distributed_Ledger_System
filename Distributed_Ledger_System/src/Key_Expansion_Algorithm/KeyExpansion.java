@@ -64,9 +64,9 @@ public class KeyExpansion {
     		}
     	}
     	// Display the words
-    	for (int i = 0; i < numberOfWords; i++) {
+    	/*for (int i = 0; i < numberOfWords; i++) {
     		System.out.printf("Word %d: 0x%08X%n", i, words[i]);
-    	}
+    	}*/
     	return words;
     	
     }
@@ -125,19 +125,5 @@ public class KeyExpansion {
 		return word_g;
     }
     //End of Method
-    
-    
-    
-    
+  
 }
-
-
-
-
-
-
-
-
-
-
-

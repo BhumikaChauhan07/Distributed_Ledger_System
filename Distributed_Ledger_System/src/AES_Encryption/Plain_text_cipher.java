@@ -30,19 +30,21 @@ public class  Plain_text_cipher{
 	 
 	public static int[][] Saved_Word = new int[11][4];
 	public static byte[][] Cipher_Text;
-    public static void main(String[] args) throws Exception {
-        String inputString = "ABCDEFGHIJKLMNOP"; // 128-bit message (16Bytes) exact // File Handling code; 
-        byte[] bytes = inputString.getBytes();
-        //KeyExpansion obj = new KeyExpansion();
-        // Original key (128 bits)
-        byte[] originalKey = KeyExpansion.GenerateKey(); // Generating a Randomly secured 128 Bits Key!!
-        int words[] = KeyExpansion.key_word_initial(originalKey);
+    public static byte[][] GenerateCipher(String inputString) throws Exception {
         
-        //Round 0- Plain Text XOR with Initial Key
+        byte[] bytes = inputString.getBytes(); //Convert each Character into byte.
+        
+        byte[] originalKey = KeyExpansion.GenerateKey(); // Generating a Randomly secured 128 Bits Key!!
+        int words[] = KeyExpansion.key_word_initial(originalKey); //Calling the Key Expansion algorithm for generation of the initial Word Set
+        
+        
+        //Round 0- Plain Text XOR with Initial Key. Initial Transformation
         for (int i = 0; i < bytes.length; i++) {
         	bytes[i] = (byte) (bytes[i] ^ originalKey[i]);
-        	System.out.println(bytes[i]);      	
+        	// System.out.println(bytes[i]);      	
 		}
+        
+        //Creating a Plain Text Byte Grid of 4x4.
         byte matrix[][] = new byte[4][4];
         int k = 0;
         for (int i=0; i<4; i++) {
@@ -52,12 +54,12 @@ public class  Plain_text_cipher{
         	}
         }
         int index=0;
+        //Storing Initial Word
+        SavedWord(index, words);
         
-        for(int i=0; i<4; i++) {
-        	 Saved_Word[index][i] = words[i];
-        }
-               
+        // Round 1 - 10 transformation of the Encryption Algorithm.
         int counter = 0;
+        
         while (counter < 10) {
         	words = KeyExpansion.round_words(words, counter);
         	// matrix = MixColumns(ShiftRows(SubstitutionBytes(matrix)));
@@ -67,32 +69,23 @@ public class  Plain_text_cipher{
         	else {
         		matrix = AddRoundKey(ShiftRows(SubstitutionBytes(matrix)), words);
         	}
-        	/*for(int i=0; i<4; i++) {
-            	System.out.println("Round Word"+words[i]);
-            }*/
+        	SavedWord(index, words); // Storing the round Words.
         	index++;
-        	for(int i=0; i<4; i++) {
-           	 Saved_Word[index][i] = words[i];
-           }
         	counter++;
         }
         
+        //Saving the Cipher text in a variable.
         byte[][] Cipher_Text = matrix;
-        
-        /*for(int i=0; i<4; i++) {
-        	for(int j=0; j<4; j++) {
-        		System.out.println(Cipher_Text[i][j]+" ");
-        	}
-        	System.out.println();
-        }*/
-        
-       /* for(int i=0; i<11; i++) {
-        	System.out.println(Saved_Word[i][0]+" "+Saved_Word[i][1]+" "+Saved_Word[i][2]+" "+Saved_Word[i][3]);
-        }*/
+		return Cipher_Text; 
     }
-    // End of Method
     
-    
+    private static int[][] SavedWord(int index, int[] words){
+    	for(int i=0; i<4; i++) {
+       	 Saved_Word[index][i] = words[i];
+       }
+    	return Saved_Word;
+    	
+    }
     
     private static byte[][] SubstitutionBytes( byte[][] bytes) {
     	for (int i = 0; i<4; i++) {
@@ -191,34 +184,4 @@ public class  Plain_text_cipher{
     }
     //End of Method
    
-    /*
-    words = {w0, w1, w2, w3}
-    w0 - 32 bit-> 32/4 => 8bit+8bit+8bit+8biit!
-    w[0] = 32/4 = 8 bits
-    w[1] = 32/4 = 8bit
-    */
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
