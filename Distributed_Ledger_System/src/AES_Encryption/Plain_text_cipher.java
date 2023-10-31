@@ -1,5 +1,9 @@
 package AES_Encryption;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import Key_Expansion_Algorithm.*;
 public class  Plain_text_cipher{
 	
@@ -28,15 +32,35 @@ public class  Plain_text_cipher{
 			 {3, 1, 1, 2}
 	 };
 	 
+	 
 	public static int[][] Saved_Word = new int[11][4];
 	public static byte[][] Cipher_Text;
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
+	
+	public static void writeArrayToFile(int[][] array) {
+		String filePath = "D:\\\\Minor 1\\\\array_data.txt";
+
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+	        for (int[] row : array) {
+	            for (int value : row) {
+	                writer.write(value + " ");
+	            }
+	            writer.newLine();
+	        }
+	    } catch (IOException e) {e.printStackTrace();} // Handle the exception properly in your code
+	}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
+
     public static byte[][] GenerateCipher(String inputString) throws Exception {
-        
+    	int index=0;
         byte[] bytes = inputString.getBytes(); //Convert each Character into byte.
         
         byte[] originalKey = KeyExpansion.GenerateKey(); // Generating a Randomly secured 128 Bits Key!!
         int words[] = KeyExpansion.key_word_initial(originalKey); //Calling the Key Expansion algorithm for generation of the initial Word Set
-        
+        SavedWord(index, words); //Storing Initial Word
+        index++;
         
         //Round 0- Plain Text XOR with Initial Key. Initial Transformation
         for (int i = 0; i < bytes.length; i++) {
@@ -53,13 +77,9 @@ public class  Plain_text_cipher{
         		k++;
         	}
         }
-        int index=0;
-        //Storing Initial Word
-        SavedWord(index, words);
         
         // Round 1 - 10 transformation of the Encryption Algorithm.
         int counter = 0;
-        
         while (counter < 10) {
         	words = KeyExpansion.round_words(words, counter);
         	// matrix = MixColumns(ShiftRows(SubstitutionBytes(matrix)));
@@ -76,16 +96,19 @@ public class  Plain_text_cipher{
         
         //Saving the Cipher text in a variable.
         byte[][] Cipher_Text = matrix;
+        writeArrayToFile(Saved_Word);
 		return Cipher_Text; 
     }
+ //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
     
     private static int[][] SavedWord(int index, int[] words){
     	for(int i=0; i<4; i++) {
        	 Saved_Word[index][i] = words[i];
        }
-    	return Saved_Word;
+    return Saved_Word;
     	
     }
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
     
     private static byte[][] SubstitutionBytes( byte[][] bytes) {
     	for (int i = 0; i<4; i++) {
@@ -99,7 +122,7 @@ public class  Plain_text_cipher{
     }
     // End of the Method
     
-    
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
     private static byte[][] ShiftRows(byte[][] bytes) {
     	int a = 0; 
 		int [] temp = new int[4];

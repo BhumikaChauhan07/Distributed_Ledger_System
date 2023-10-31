@@ -34,40 +34,13 @@ public class Cipher_text_plain{
 	
 	static int[] word = new int[4];
 	static int[][] retrieved_Saved_Words = new int[11][4];
-	public static void main(String[] args) {
-		
-		 byte[][] cipher_text = {
-				 {123 ,21, -2, -5}, 
-				 {-36, -10, 74, -67 },
-				 {-11, -115, -67, 23 },
-				 {-113, 33, -39, 29 }
-		 };
+	public static String Dcrypt(byte[][] cipher_text) {
 		// Initial Word XOR 
 				String filePath = "D:\\Minor 1\\array_data.txt";
 				retrieved_Saved_Words  = readArrayFromFile(filePath);
-				System.out.println("saved words before reversal:");
-				for (int i = 0; i < 11; i++) {
-					for (int j = 0; j < 4; j++) {
-						System.out.print(retrieved_Saved_Words [i][j] +" ");
-					}
-					System.out.println();
-				}
-				
+								
 				byte[][] textbyte = GeneratePlain(cipher_text,retrieved_Saved_Words);
-				System.out.println();
-				System.out.println();
-				System.out.println();
-				System.out.println();
-				for (int i = 0; i < 4; i++) {
-        			for (int j = 0; j < 4; j++) {
-        				System.out.print(textbyte[i][j]);
-        			}
-        			System.out.println();
-        		}
-				System.out.println();
-				System.out.println();
-				System.out.println();
-				System.out.println();
+				
 				StringBuilder result = new StringBuilder();
 
 		        for (int i = 0; i < 4; i++) {
@@ -79,13 +52,12 @@ public class Cipher_text_plain{
         		}
 
 		        String finalString = result.toString();
-		        System.out.println(finalString);
+		        return finalString;
+		        
 	}
 		
-	
-	
 
-	public static /*String*/byte[][] GeneratePlain(byte[][] matrix , int[][] words) {
+	public static byte[][] GeneratePlain(byte[][] matrix , int[][] words) {
 		// Initial Word XOR 
 		//InverseWord(words);
 		int index = 10;
@@ -102,18 +74,6 @@ public class Cipher_text_plain{
 				matrix[j][i] = (byte) (matrix[j][i] ^ (byte)cipherValue);
 			}
 		}
-		System.out.println("Round 0: ");
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				System.out.println(matrix[j][i]);
-			}
-		}
-		System.out.println("Word for the Round 0");
-		for (int i = 0; i < 4; i++) {
-			System.out.println(word[i]);
-	}
-		System.out.println();
-		
 		
 		//Round 1 - 10: Reverse Transformation
 		int counter = 0;
@@ -127,29 +87,9 @@ public class Cipher_text_plain{
         	// matrix = MixColumns(ShiftRows(SubstitutionBytes(matrix)));
         	if(counter < 9) {
         		matrix = InverseMixColumns(InverseAddRoundKey(SubstitutionBytes(InverseShiftRows(matrix)), word));
-        		System.out.println("Round : "+(counter+1));
-        		for (int i = 0; i < 4; i++) {
-        			for (int j = 0; j < 4; j++) {
-        				System.out.println(matrix[j][i]);
-        			}
-        		}
-        		System.out.println();
-        		for (int i = 0; i < 4; i++) {
-        				System.out.println(word[i]);
-        		}
         	}
         	else {
         		matrix = InverseAddRoundKey(SubstitutionBytes(InverseShiftRows(matrix)), word);
-        		System.out.println("Round : "+(counter+1));
-        		for (int i = 0; i < 4; i++) {
-        			for (int j = 0; j < 4; j++) {
-        				System.out.println(matrix[j][i]);
-        			}
-        		}
-        		System.out.println();
-        		for (int i = 0; i < 4; i++) {
-    				System.out.println(word[i]);
-    		}
         	}
         	counter++;
         }	
@@ -189,9 +129,6 @@ public class Cipher_text_plain{
 			}
 			a = 0;
 		}
-		
-		
-		
     	/*for (int i = 1; i < 4; i++) {
             int a = 0;
             int[] temp = new int[4];
