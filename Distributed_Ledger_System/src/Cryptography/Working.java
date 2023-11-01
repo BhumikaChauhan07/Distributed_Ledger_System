@@ -1,12 +1,17 @@
 package Cryptography;
 
+
+
 import AES_Decryption.Cipher_text_plain;
 import AES_Encryption.*;
 
 public class Working {
 
 	public static void main(String[] args) throws Exception {
-		String inputString = "Bhumika Chauhan7";
+		try {
+		String inputString = "Distributed Ledg";
+		 
+		
 		byte[][] Cipher_Text = Encryption(inputString);
 		
 		System.out.println("Input String: "+inputString);
@@ -23,7 +28,7 @@ public class Working {
 		System.out.println("Cipher Text: "+finalString);
 		System.out.println();
 		System.out.println("Decrypted Text: "+Decryption(Cipher_Text));
-		
+		} catch (Exception e) {System.out.print("Entered Text Should be of 16 byte");}
 	}
 	
 	private static String Decryption(byte[][] cipher_Text) {
